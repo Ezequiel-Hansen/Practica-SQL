@@ -80,6 +80,43 @@ values(p_nombre, p_nacionalidad,p_fecha_nacimiento);
 end
 delimiter $$
 
--- 4 
+-- 4 fn_contar_libros_autor
+-- Recibe el ID de un autor y devuelve la cantidad de libros asoci
+delimiter $$
+CREATE function fn_contar_libros_autor(p_id_autor int)
+returns int
+begin;
+DECLARE cant_libros
+SELECT count(*) INTO cant_libros FROM libros
+WHERE autor_id=p_id_autor;
+returns cant_libros;
+end;
+delimiter $$
 
+-- 5 sp_actualizar_libro
+-- Recibe ID y todos los datos de un libro, y actualiza sus datos si existe.
+delimiter $$
+CREATE procedure sp_actualizar_libro(in p_id_libro int, p_titulo_libro varchar(100), p_genero_libro varchar(50), p_anio_publicacion_libro int, p_disponible boolean, p_autor_id int)
+begin;
+update into libros(id, titulo, autor_id, genero, anio_publicacion, disponible) values(p_id_libro, p_titulo_libro, p_autor_id, p_genero_libro, p_anio_publicacion, p_disponible)
+end;
+delimiter $$
+
+-- 6 sp_libros_disponibles_por_genero
+-- Recibe un género y devuelve título, autor y año de publicación de todos los
+-- libros disponibles de ese género.
+delimiter $$
+CREATE procedure sp_libros_disponibles_por_genero(in p_genero)
+begin
+select titulo, autor, anio_publicacion FROM libros
+where genero = p_genero and disponible = true;
+end
+delimiter $$
+
+
+-- 7 fn_calcular_multa
+-- Recibe el ID de un préstamo y devuelve el importe de la multa:
+-- ○ 0$ si no hay retraso
+-- ○ 500$ por día (primeros 10 días)
+-- ○ 1000$ por día (desde el día 11 en adelante)
 
