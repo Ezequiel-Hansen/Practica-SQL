@@ -1,0 +1,85 @@
+CREATE DATABASE IF NOT EXISTS biblioteca;
+USE biblioteca;
+CREATE TABLE autores (
+id INT AUTO_INCREMENT PRIMARY KEY,
+nombre VARCHAR(100) NOT NULL,
+nacionalidad VARCHAR(50),
+fecha_nacimiento DATE
+);
+CREATE TABLE libros (
+id INT AUTO_INCREMENT PRIMARY KEY,
+titulo VARCHAR(200) NOT NULL,
+autor_id INT,
+genero VARCHAR(50),
+anio_publicacion INT,
+disponible BOOLEAN DEFAULT TRUE,
+FOREIGN KEY (autor_id) REFERENCES autores(id)
+);
+CREATE TABLE prestamos (
+id INT AUTO_INCREMENT PRIMARY KEY,
+libro_id INT,
+nombre_usuario VARCHAR(100),
+fecha_prestamo DATE,
+fecha_devolucion_prevista DATE,
+fecha_devolucion_real DATE,
+FOREIGN KEY (libro_id) REFERENCES libros(id)
+);
+INSERT INTO autores (nombre, nacionalidad, fecha_nacimiento) VALUES
+('Gabriel García Márquez', 'Colombiana', '1927-03-06'),
+('J.K. Rowling', 'Británica', '1965-07-31'),
+('Jorge Luis Borges', 'Argentina', '1899-08-24'),
+('Isabel Allende', 'Chilena', '1942-08-02'),
+('Haruki Murakami', 'Japonesa', '1949-01-12');
+INSERT INTO libros (titulo, autor_id, genero, anio_publicacion, disponible) VALUES
+('Cien años de soledad', 1, 'Realismo mágico', 1967, TRUE),
+('Harry Potter y la piedra filosofal', 2, 'Fantasía', 1997, TRUE),
+('El Aleph', 3, 'Ficción', 1949, TRUE),
+('La casa de los espíritus', 4, 'Realismo mágico', 1982, TRUE),
+('Tokio blues (Norwegian Wood)', 5, 'Novela', 1987, TRUE),
+('Crónica de una muerte anunciada', 1, 'Novela', 1981, TRUE),
+('Harry Potter y la cámara secreta', 2, 'Fantasía', 1998, FALSE),
+('Ficciones', 3, 'Ficción', 1944, TRUE),
+('De amor y de sombra', 4, 'Drama', 1984, TRUE),
+('Kafka en la orilla', 5, 'Novela', 2002, TRUE);
+
+-- 1. Función fn_obtener_genero Recibe el ID de un libro y devuelve su género. Si el libro no existe, 
+-- devuelve "Desconocido". 
+delimiter $$
+create function fn_obtener_genero(p_libro int)
+returns VARCHAR(50)
+begin
+declare genero_libro VARCHAR(50);
+select genero into genero_libro from libros
+where id=p_libro;
+if genero_libro is null then 
+	return "Desconocido";
+else
+	return genero_libro;
+end if;
+end $$
+delimiter ;
+-- 2. Procedimiento sp_marcar_no_disponible Recibe el ID de un libro y 
+-- lo marca como no disponible (disponible = FALSE). 
+delimiter $$
+create procedure sp_marcar_no_disponible (in p_libro int)
+begin
+update libros 
+set disponible = false
+where id=p_libro;
+end $$
+delimiter ;
+
+-- 3. sp_insertar_autor
+-- Recibe nombre, nacionalidad y fecha de nacimiento de un autor y lo inserta en la tabla autores.
+
+delimiter $$
+create PROCEDURE sp_insertar_autor(in p_nombre varchar(50), p_nacionalidad varchar(50), p_fecha_nacimiento DATE)
+begin
+insert into autores (nombre, nacionalidad, fecha_nacimiento)
+values(p_nombre, p_nacionalidad,p_fecha_nacimiento);
+end
+delimiter $$
+
+-- 4 
+
+
