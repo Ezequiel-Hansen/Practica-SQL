@@ -96,10 +96,16 @@ delimiter $$
 -- 5 sp_actualizar_libro
 -- Recibe ID y todos los datos de un libro, y actualiza sus datos si existe.
 delimiter $$
-CREATE procedure sp_actualizar_libro(in p_id_libro int, p_titulo_libro varchar(100), p_genero_libro varchar(50), p_anio_publicacion_libro int, p_disponible boolean, p_autor_id int)
+CREATE procedure sp_actualizar_libro(in p_id_libro int, in p_titulo_libro varchar(100), in p_genero_libro varchar(50), in p_anio_publicacion_libro int, in p_disponible boolean, in p_autor_id int)
 begin;
-update into libros(id, titulo, autor_id, genero, anio_publicacion, disponible) values(p_id_libro, p_titulo_libro, p_autor_id, p_genero_libro, p_anio_publicacion, p_disponible)
-end;
+update libros set 
+titulo=p_titulo_libro, 
+autor_id=p_autor_id, 
+genero=p_genero_libro, 
+anio_publicacion=p_anio_publicacion, 
+disponible=p_disponible 
+WHERE id=p_id_libro;
+end
 delimiter $$
 
 -- 6 sp_libros_disponibles_por_genero
@@ -119,4 +125,25 @@ delimiter $$
 -- ○ 0$ si no hay retraso
 -- ○ 500$ por día (primeros 10 días)
 -- ○ 1000$ por día (desde el día 11 en adelante)
+delimiter $$
+CREATE function fn_calcular_multa(p_id int)
+returns decimal(10,2)
+declare v_intereses int
+declare v_fecha_retraso date
+declare v_fecha_previa date
+declare v_retraso int
+begin
+ select fecha_devolucion_real, fecha_devolucion_previa into v_fecha_retraso, v_fecha_previa from prestamos
+ where id=p_id;
+ set v_retraso= DATEDIFF(v_fecha_real, v_fecha_previa);
+if (v_retraso >0) then
+	if(v_retraso <=10) then
+		set v_intereses= v_fecha_retraso * 500;
+	else
+		set v_intereses= (10*500) + (v_fecha_retraso -10) *1000);
+    end if;
+end if;
 
+returns v_intereses;
+end
+delimiter $$
