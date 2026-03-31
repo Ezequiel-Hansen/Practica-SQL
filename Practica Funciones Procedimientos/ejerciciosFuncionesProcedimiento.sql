@@ -147,3 +147,44 @@ end if;
 returns v_intereses;
 end
 delimiter $$
+
+
+-- 8  sp_registrar_libro
+-- Recibe título, nombre del autor, género y año. Si el autor existe, lo usa; si no,
+-- lo crea.
+
+delimiter $$
+CREATE procedure sp_registrar_libro(in p_titulo varchar, in p_autor_nombre int , in p_genero varchar, in p_anio_publicacion int)
+declare v_autor_id varchar
+begin
+	select id into v_autor_id from autores
+    where nombre=p_autor_nombre
+    limit 1;
+	if(v_autor_id is null) then
+		insert into autores (nombre,nacionalidad,fecha_nacimiento) values(p_autor_nombre)
+        set v_autor_id= LAST_INSERT_ID()
+    else
+		insert into libros (titulo, autor, genero, anio_publicacion, disponible) values (,p_titulo, v_autor_id, p_genero, p_anio_publicacion, true)
+    end if;
+end;
+
+delimiter $$
+
+
+-- 9  fn_promedio_libros_por_autor
+-- Devuelve la media de libros por autor.
+
+delimiter $$
+
+CREATE function fn_promedio_libros_por_autor()
+	returns decimal(10,2)
+begin
+declare v_media_libro decimal(10,2)
+
+
+
+
+end
+
+delimiter $$
+    
