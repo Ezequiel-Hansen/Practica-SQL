@@ -180,11 +180,56 @@ CREATE function fn_promedio_libros_por_autor()
 	returns decimal(10,2)
 begin
 declare v_media_libro decimal(10,2)
-
-
-
-
-end
+select AVG(conteo_libros) into v_media_libro
+from(
+	select count(*) as conteo_libros
+	from libros
+	group by autor_id)
+returns v_media_libros
+end;
 
 delimiter $$
+
+
+-- 10  sp_categorizar_libros
+-- Recibe un año y clasifica los libros según su publicación:
+-- ○ Clásico (antes de 1900)
+-- ○ Moderno (1900 hasta el año parámetro)
+-- ○ Contemporáneo (después del año parámetro)
+
+delimiter $$
+CREATE PROCEDURE sp_categorizar_libros(IN p_anio_publicacion int)
+begin
+
+select anio_publicacion from libro
+
+if(p_anio_publicacion < 1900) then
+	return "Clasico";
+if else (p_anio_publicacion >= 1900 and anio_publicacion <= p_anio_publicacion) then
+	return "Moderno";
+else
+	return "Contemporaneo";
+    
+end if;
+end if;
+end;
+
+delimiter $$
+
+-- 11 sp_autores_por_nacionalidad
+-- Recibe una nacionalidad y devuelve autores, sus libros y la cantidad de
+-- préstamos por libro.
+
+delimiter $$
+create procedure sp_autores_por_nacionalidad(in p_nacionalidad, out p_autores, )
+
+
+delimiter $$
+
+
+
+
+
+
+
     
